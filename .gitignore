@@ -1,0 +1,19 @@
+# Ignorar carpetas generadas por NetBeans
+/build/
+/dist/
+nbproject/private/
+
+# Ignorar archivos compilados
+*.class
+
+# Ignorar configuraciones locales
+*.log
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos comprimidos
+*.zip
+*.tar.gz
+
+# Ignorar archivos temporales
+*.tmp
