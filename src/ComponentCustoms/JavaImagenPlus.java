@@ -1,20 +1,25 @@
-package JavaComponentsPlus;
+package ComponentCustoms;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.beans.BeanProperty;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 public class JavaImagenPlus extends JLabel {
-     //+++++++++++++++++++++ SETTERS+++++++++++++++++++++++++++++++ //
-    @BeanProperty(preferred = true, visualUpdate = true) 
+    //+++++++++++++++++++++ SETTERS+++++++++++++++++++++++++++++++ //
+
+    @BeanProperty(preferred = true, visualUpdate = true)
     public void setImage(File file) {
         if (isValidImageFile(file)) {  // Verificar si el archivo es válido
             try {
-                image = ImageIO.read(file); 
+                image = ImageIO.read(file);
                 imageLoaded = true;
                 revalidate();
                 repaint();
@@ -26,28 +31,26 @@ public class JavaImagenPlus extends JLabel {
             System.err.println("Archivo no válido o no es una imagen.");
             imageLoaded = false;
         }
-    }   
-    
-//+++++++++++++++++++++START CODE MAIN+++++++++++++++++++++++++++++++ //
-
-    public JavaImagenPlus() {
-      setBounds(0, 0, 100, 100);
-       setPreferredSize(new Dimension(100, 100));  
     }
 
+//+++++++++++++++++++++START CODE MAIN+++++++++++++++++++++++++++++++ //
+    public JavaImagenPlus() {
+        setBounds(0, 0, 100, 100);
+        setPreferredSize(new Dimension(100, 100));
+    }
 
     public JavaImagenPlus(File file) {
         setBounds(0, 0, 100, 100);
-        setPreferredSize(new Dimension(100, 100));  
-        setImage(file); 
+        setPreferredSize(new Dimension(100, 100));
+        setImage(file);
     }
 
-   //+++++++++++++++++++++ IMAGEN +++++++++++++++++++++++++++++++ //
+    //+++++++++++++++++++++ IMAGEN +++++++++++++++++++++++++++++++ //
     /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     | ~ ~ ~ Method:    setImagenPlus                                                                        |
     | ~Description:   Establece la imagen desde recursos dentro del proyecto.       |
     +=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-        private transient Image image;  // Imagen que se cargará
+    private transient Image image;  // Imagen que se cargará
     private boolean imageLoaded = false;  // Estado de carga de imagen
 
     public void setImagenPlus(String carpetaDeProyecto, String nameImg) {
