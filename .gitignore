@@ -1,8 +1,8 @@
 # Ignorar carpetas generadas por NetBeans
-build/
-dist/
-test/
-nbproject/private/
+/build/
+/dist/
+/test/
+/nbproject/private/
 
 # Ignorar archivos compilados
 *.class
