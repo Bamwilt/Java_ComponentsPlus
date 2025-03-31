@@ -1,11 +1,12 @@
 # Ignorar carpetas generadas por NetBeans
-/build/
-/dist/
-/test/
+build/
+dist/
+test/
 nbproject/private/
 
 # Ignorar archivos compilados
 *.class
+build.xml
 
 # Ignorar configuraciones locales
 *.log
