@@ -24,11 +24,12 @@ Su objetivo es proporcionar herramientas mejoradas para desarrolladores que dese
 - **conversión a HTML y Markdown**, facilitando la integración con otros sistemas.
 - **Interfaz intuitiva** con herramientas de formato enriquecido.
 - **Vista previa dinámica** para una edición más eficiente.
+  
+![Java Components Plus](src/resources/JavaMarkdonwEditor.png)
 
 ## Beneficios
 - **Mejora visual significativa** de las interfaces gráficas en Java Swing.
 - **Facilidad de uso** con integración sencilla en proyectos Swing.
-- **Mayor productividad** con componentes optimizados y modernos.
 - **Personalización flexible**, adaptándose a diversas necesidades de desarrollo.
 - **Compatibilidad con proyectos existentes**, sin requerir grandes modificaciones.
 
