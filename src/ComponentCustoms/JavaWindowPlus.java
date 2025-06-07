@@ -2,16 +2,23 @@ package ComponentCustoms;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -31,6 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -39,12 +47,25 @@ import javax.swing.border.LineBorder;
 public class JavaWindowPlus extends JFrame {
 
     // <editor-fold desc="ɢᴇᴛ&ꜰᴏɴᴛ">
-    public void setWindowBorderColor(Color color) {
+    public void addPlus(Component component) {
+        CONTENTPANEL.add(component);
+        repaintFrame();
+    }
+
+    public void addPlusinBorder(Component component, String directionBorderLayout) {
+        if (!(CONTENTPANEL.getLayout() instanceof BorderLayout)) {
+            CONTENTPANEL.setLayout(new BorderLayout());
+        }
+        CONTENTPANEL.add(component, directionBorderLayout);
+        repaintFrame();
+    }
+
+    public void setBackgroundPlus(Color color) {
         this.COLORBORDER = color;
         repaintFrame();
     }
 
-    public void setForeIconColor(Color color) {
+    public void setForegroundPlus(Color color) {
         this.COLORFOREICON = color;
         TitleBar.repaintForeIcon();
     }
@@ -54,10 +75,14 @@ public class JavaWindowPlus extends JFrame {
     }
 
     public void setMarginBorder(int margin) {
-        MARGIN = Math.max(3, Math.min(300, margin));
+        MARGIN = Math.max(0, Math.min(300, margin));
         MIN_SIZE = new Dimension(320, TITLEBAR_HEIGHT + (MARGIN * 2) - 1);
         marginBorder = BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN);
         JFramePanel.setBorder(BorderFactory.createCompoundBorder(lineBorder, marginBorder));
+    }
+
+    public int getMarginBorder() {
+        return MARGIN;
     }
 
     public void setSizePlus(int width, int height) {
@@ -167,6 +192,13 @@ public class JavaWindowPlus extends JFrame {
     private Dimension JFRAME_SIZE = new Dimension(600, 400);
     private boolean RESIZABLE = true;
 
+    public JavaWindowPlus() {
+        CONTENTPANEL = new JPanel();
+        CONTENTPANEL.setPreferredSize(new Dimension(500, 300));
+        CONTENTPANEL.setLayout(new BorderLayout());
+        initComponents();
+    }
+
     public JavaWindowPlus(JPanel ContentPanel) {
         CONTENTPANEL = ContentPanel;
         initComponents();
@@ -226,9 +258,23 @@ public class JavaWindowPlus extends JFrame {
 
     private MouseMotionAdapter listenerRedimension;
     private boolean isDragged;
+    private boolean f11Pressed = false;
 
     private void setEventResize() {
-
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent e) -> {
+            if (e.getKeyCode() == KeyEvent.VK_F11) {
+                if (e.getID() == KeyEvent.KEY_PRESSED && !f11Pressed) {
+                    f11Pressed = true;
+                    toggleFullScreen(this);
+                    return true;
+                }
+                if (e.getID() == KeyEvent.KEY_RELEASED) {
+                    f11Pressed = false;
+                    return true;
+                }
+            }
+            return false;
+        });
         JFramePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -269,6 +315,29 @@ public class JavaWindowPlus extends JFrame {
         };
 
         JFramePanel.addMouseMotionListener(listenerRedimension);
+    }
+
+    private boolean isFullScreen = false;
+    private int margin = MARGIN;
+
+    private void toggleFullScreen(JFrame frame) {
+
+        if (!isFullScreen) {
+            WindowFrame = getBounds();
+            this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JFramePanel.remove(TitleBar);
+            margin = MARGIN;
+            setMarginBorder(0);
+        } else {
+            if (WindowFrame != null) {
+                this.setExtendedState(JFrame.NORMAL);
+                this.setMarginBorder(margin);
+                JFramePanel.add(TitleBar, BorderLayout.NORTH);
+            }
+        }
+        repaint();
+        revalidate();
+        isFullScreen = !isFullScreen;
     }
 
     private Cursor newCursor;
@@ -433,6 +502,12 @@ public class JavaWindowPlus extends JFrame {
             setBackground(COLORBORDER);
             setTitle();
             addEvents();
+            InitWindowTemp();
+        }
+        JWindow windowTemp = new JWindow();
+
+        private void InitWindowTemp() {
+            windowTemp.setBackground(new Color(150, 250, 250, 150));
         }
 
         private void setTitle() {
@@ -458,6 +533,14 @@ public class JavaWindowPlus extends JFrame {
                 public void mouseEntered(MouseEvent e) {
                     setCursor(Cursor.getDefaultCursor());
                 }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (windowTemp.isVisible()) {
+                        windowTemp.setVisible(false);
+                    }
+                    setFullScreenInDirection(e, mainF);
+                }
             }
             );
 
@@ -466,11 +549,43 @@ public class JavaWindowPlus extends JFrame {
                 public void mouseDragged(MouseEvent e) {
                     int venX = e.getXOnScreen();
                     int venY = e.getYOnScreen();
-
                     mainF.setLocation(venX - xMouse, venY - yMouse);
+                    setFullScreenInDirection(e, windowTemp);
                 }
             }
             );
+        }
+
+        private void setFullScreenInDirection(MouseEvent mouse, Window window) {
+            String border = getNameBorder(mouse.getXOnScreen(), mouse.getYOnScreen());
+
+            if (border != null) {
+                if (window instanceof JWindow) {
+                    window.setVisible(true);
+                }
+                maximiceInScreen(window, border);
+            } else {
+                if (window instanceof JWindow) {
+                    window.setVisible(false);
+                }
+            }
+        }
+
+        private String getNameBorder(int x, int y) {
+            Rectangle screen = getBoundsFullScreen();
+            int screenWidth = (int) (screen.getWidth() - 1);
+            int screenHeigth = (int) (screen.getHeight() - 1);
+            if (x < 1) {
+                return "left";
+            } else if (x >= screenWidth) {
+                return "right";
+            }
+            if (y < 1) {
+                return "top";
+            } else if (y >= screenHeigth) {
+                return "bottom";
+            }
+            return null;
         }
 
         private void addContentButtons() {
@@ -499,7 +614,7 @@ public class JavaWindowPlus extends JFrame {
 
                 TEXTBUTTONS.get(i).setHorizontalAlignment(SwingConstants.CENTER);
                 TEXTBUTTONS.get(i).setForeground(COLORFOREICON);
-                TEXTBUTTONS.get(i).setFont(new Font("Sungui IU", 0, 14));
+                TEXTBUTTONS.get(i).setFont(new Font("Dialog", 0, 14));
                 button.add(TEXTBUTTONS.get(i));
 
                 button.addMouseListener(iluminateButton(button, (i < 1)));
@@ -557,15 +672,62 @@ public class JavaWindowPlus extends JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (isMaximized) {
-                        mainF.setExtendedState(JFrame.NORMAL);
+                        mainF.setBounds(frameBoundsOriginal);
                     } else {
-                        mainF.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                        frameBoundsOriginal = mainF.getBounds();
+                        maximiceInScreen(mainF, "center");
                     }
 
                     TEXTBUTTONS.get(maximizedNumButton).setText((isMaximized) ? "🗖" : "🗗");
                     isMaximized = !isMaximized;
                 }
             };
+        }
+
+        Rectangle frameBoundsOriginal;
+
+        private Rectangle getBoundsFullScreen() {
+            GraphicsConfiguration config = mainF.getGraphicsConfiguration();
+            return config.getBounds();
+        }
+
+        private Insets getScreenInsets() {
+            GraphicsConfiguration config = mainF.getGraphicsConfiguration();
+            return Toolkit.getDefaultToolkit().getScreenInsets(config);
+        }
+
+        private Rectangle getFullScreenInsets() {
+            Rectangle screenBounds = getBoundsFullScreen();
+            Insets screenInsets = getScreenInsets();
+
+            int x = screenBounds.x + screenInsets.left;
+            int y = screenBounds.y + screenInsets.top;
+            int width = screenBounds.width - screenInsets.left - screenInsets.right;
+            int height = screenBounds.height - screenInsets.top - screenInsets.bottom;
+            return new Rectangle(x, y, width, height);
+        }
+
+        private void maximiceInScreen(Window window, String border) {
+            Rectangle screen = getFullScreenInsets();
+            int x = (int) screen.getX();
+            int y = (int) screen.getY();
+            int width = (int) screen.getWidth();
+            int height = (int) screen.getHeight();
+
+            switch (border.toLowerCase()) {
+                case "right" ->
+                    window.setBounds(x + width / 2, y, width / 2, height);
+                case "left" ->
+                    window.setBounds(x, y, width / 2, height);
+                case "bottom" ->
+                    window.setBounds(x, y + height / 2, width, height / 2);
+                case "top" ->
+                    window.setBounds(x, y, width, height / 2);
+                case "center", "full", "maximize", "" ->
+                    window.setBounds(x, y, width, height);
+                default ->
+                    throw new IllegalArgumentException("Opción inválida: " + border);
+            }
         }
 
         private MouseAdapter funtionMinimized(JPanel button) {
@@ -598,12 +760,15 @@ public class JavaWindowPlus extends JFrame {
             if (isMessageShow) {
                 return;
             }
+
             isMessageShow = true;
 
             title.setText(String.format(message + " - %s", title.getText()));
             scheduler.schedule(() -> {
-                title.setText(title.getText().replace(message + " - ", ""));
-                isMessageShow = false;
+                SwingUtilities.invokeLater(() -> {
+                    title.setText(title.getText().replace(message + " - ", ""));
+                    isMessageShow = false;
+                });
             }, 700, TimeUnit.MILLISECONDS);
         }
 

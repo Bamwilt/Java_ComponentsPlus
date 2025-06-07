@@ -58,7 +58,7 @@ public class JMarkdonwEditor extends JPanel {
 
     private JLabel[] labelsDecoration = new JLabel[]{
         new JLabel("📖"),
-        new JLabel("README.md"),
+        new JLabel("README"),
         new JLabel("⚖"),
         new JLabel("️MIT license"),};
 
