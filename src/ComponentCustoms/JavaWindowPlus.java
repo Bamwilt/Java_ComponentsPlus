@@ -199,6 +199,14 @@ public class JavaWindowPlus extends JFrame {
         initComponents();
     }
 
+    public JavaWindowPlus(String title_) {
+        TITLE = title_;
+        CONTENTPANEL = new JPanel();
+        CONTENTPANEL.setPreferredSize(new Dimension(500, 300));
+        CONTENTPANEL.setLayout(new BorderLayout());
+        initComponents();
+    }
+
     public JavaWindowPlus(JPanel ContentPanel) {
         CONTENTPANEL = ContentPanel;
         initComponents();
